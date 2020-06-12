@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { BrowserRouter as router, Route, Link } from 'react-router-dom';
 import { Form, FormGroup, Dropdown, Input, Card, CardImg, DropdownToggle, DropdownMenu, label, Button } from "reactstrap";
+import axios from 'axios';
+import * as yup from 'yup';
 
 
 
@@ -34,6 +36,27 @@ const OrderForm = () => {
             ...formData,
             [e.target.name]: e.target.checked
         });
+    };
+
+    const formSchema = yup.object().shape({
+        name: yup.string().required(),
+        number: yup.number().required().positive().integer().min(1),
+        sauce: yup.string().required(),
+        meat: yup.string().required(),
+        special: yup.string(),
+        cilantro: yup.boolean(),
+        whiteOnion: yup.boolean(),
+        lime: yup.boolean(),
+        avacado: yup.boolean()
+    });
+    const submit = () => {
+        formSchema.validate(formData)
+            .then(() => {
+                axios.post('https://reqres.in/', formData)
+                    .then((res) => {
+                        console.log('This is your posted data', res.data)
+                    })
+            })
     }
 
     return (
@@ -46,7 +69,7 @@ const OrderForm = () => {
             </Card>
             <Form onSubmit={(e) => {
                 e.preventDefault();
-                console.log('from Form', formData);
+                submit();
             }} style={{ margin: '5%' }}>
                 <FormGroup>
                     <legend>Name</legend>
